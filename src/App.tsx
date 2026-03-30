@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import CoordinatorDashboard from './pages/CoordinatorDashboard';
 import RescueStep1 from './pages/RescueStep1';
 import RescueStep2 from './pages/RescueStep2';
 import RescueStep3 from './pages/RescueStep3';
@@ -24,27 +25,32 @@ export default function App() {
               
               {/* Protected Routes */}
               <Route path="/dashboard" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['CITIZEN', 'RESCUE_TEAM']}>
                   <DashboardPage />
                 </ProtectedRoute>
               } />
+              <Route path="/coordinator" element={
+                <ProtectedRoute allowedRoles={['COORDINATOR']}>
+                  <CoordinatorDashboard />
+                </ProtectedRoute>
+              } />
               <Route path="/rescue/step1" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['CITIZEN']}>
                   <RescueStep1 />
                 </ProtectedRoute>
               } />
               <Route path="/rescue/step2" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['CITIZEN']}>
                   <RescueStep2 />
                 </ProtectedRoute>
               } />
               <Route path="/rescue/step3" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['CITIZEN']}>
                   <RescueStep3 />
                 </ProtectedRoute>
               } />
               
-              <Route path="/" element={<Navigate to="/rescue/step1" replace />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </Router>
         </RescueProvider>

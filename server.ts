@@ -203,6 +203,159 @@ async function startServer() {
     });
   });
 
+  app.get('/api/requests', (req, res) => {
+    const { page = 0, size = 20, status, urgencyLevel } = req.query;
+    
+    // Mock data for coordinator (all requests)
+    const allRequests = [
+      {
+        id: 'REQ-A1B2C3',
+        status: 'PENDING',
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+        lat: 10.762622,
+        lng: 106.660172,
+        addressText: '227 Nguyễn Văn Cừ, Quận 5, TP.HCM',
+        urgencyLevel: 'CRITICAL',
+        description: 'Nước dâng cao đến tầng 2, có 3 người đang ở trên mái tôn.',
+        numPeople: 3,
+        citizenPhone: '0912345678',
+        citizenName: 'Nguyễn Văn A',
+        hasInjured: false,
+        hasChildren: true,
+        hasElderly: false,
+        hasPets: true,
+        statusHistory: [
+          { status: 'PENDING', time: new Date(Date.now() - 1000 * 60 * 30).toISOString(), note: 'Yêu cầu đã được gửi' }
+        ]
+      },
+      {
+        id: 'REQ-D4E5F6',
+        status: 'VERIFIED',
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+        lat: 10.773622,
+        lng: 106.671172,
+        addressText: '123 Cách Mạng Tháng 8, Quận 10, TP.HCM',
+        urgencyLevel: 'HIGH',
+        description: 'Cần hỗ trợ di dời đồ đạc và người già.',
+        numPeople: 2,
+        citizenPhone: '0987654321',
+        citizenName: 'Trần Thị B',
+        hasInjured: false,
+        hasChildren: false,
+        hasElderly: true,
+        hasPets: false,
+        statusHistory: [
+          { status: 'PENDING', time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), note: 'Yêu cầu đã được gửi' },
+          { status: 'VERIFIED', time: new Date(Date.now() - 1000 * 60 * 60 * 1.5).toISOString(), note: 'Thông tin đã được xác minh' }
+        ]
+      },
+      {
+        id: 'REQ-G7H8I9',
+        status: 'ASSIGNED',
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+        lat: 10.751622,
+        lng: 106.650172,
+        addressText: '456 Trần Hưng Đạo, Quận 5, TP.HCM',
+        urgencyLevel: 'MEDIUM',
+        description: 'Hết lương thực dự trữ.',
+        numPeople: 4,
+        citizenPhone: '0901234567',
+        citizenName: 'Lê Văn C',
+        hasInjured: false,
+        hasChildren: true,
+        hasElderly: false,
+        hasPets: false,
+        teamInfo: {
+          teamName: 'Đội Cứu Hộ Quận 5',
+          memberCount: 4,
+          phone: '0901234567'
+        },
+        statusHistory: [
+          { status: 'PENDING', time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() },
+          { status: 'ASSIGNED', time: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(), note: 'Đã điều động đội cứu hộ' }
+        ]
+      },
+      {
+        id: 'REQ-J1K2L3',
+        status: 'COMPLETED',
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+        lat: 10.782622,
+        lng: 106.690172,
+        addressText: '789 Lê Duẩn, Quận 1, TP.HCM',
+        urgencyLevel: 'LOW',
+        description: 'Cần hỗ trợ thực phẩm và nước uống.',
+        numPeople: 1,
+        citizenPhone: '0911223344',
+        citizenName: 'Phạm Văn D',
+        hasInjured: false,
+        hasChildren: false,
+        hasElderly: false,
+        hasPets: false,
+        statusHistory: [
+          { status: 'PENDING', time: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() },
+          { status: 'COMPLETED', time: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(), note: 'Đã hoàn thành cứu hộ' }
+        ]
+      }
+    ];
+
+    let filtered = allRequests;
+    if (status && status !== 'null') {
+      filtered = filtered.filter(r => r.status === status);
+    }
+    if (urgencyLevel && urgencyLevel !== 'null') {
+      filtered = filtered.filter(r => r.urgencyLevel === urgencyLevel);
+    }
+
+    const totalElements = filtered.length;
+    const totalPages = Math.ceil(totalElements / Number(size));
+    const content = filtered.slice(Number(page) * Number(size), (Number(page) + 1) * Number(size));
+
+    return res.status(200).json({
+      content,
+      page: Number(page),
+      size: Number(size),
+      totalElements,
+      totalPages
+    });
+  });
+
+  app.get('/api/requests/stats', (req, res) => {
+    // Mock stats for coordinator
+    return res.status(200).json({
+      pending: 12,
+      verified: 8,
+      assigned: 15,
+      inProgress: 5,
+      completedToday: 24
+    });
+  });
+
+  app.get('/api/teams/available', (req, res) => {
+    // Mock available teams
+    return res.status(200).json([
+      { id: 'T1', teamName: 'Đội Phản Ứng Nhanh 1', distance: 1.2, currentWorkload: 2, memberCount: 4, phone: '090111222' },
+      { id: 'T2', teamName: 'Đội Cứu Hộ Quận 3', distance: 2.5, currentWorkload: 0, memberCount: 6, phone: '090333444' },
+      { id: 'T3', teamName: 'Tình Nguyện Viên Chữ Thập Đỏ', distance: 0.8, currentWorkload: 5, memberCount: 10, phone: '090555666' }
+    ]);
+  });
+
+  app.post('/api/requests/:id/verify', (req, res) => {
+    const { id } = req.params;
+    const { note } = req.body;
+    return res.status(200).json({ success: true, message: `Request ${id} verified with note: ${note}` });
+  });
+
+  app.post('/api/requests/:id/assign', (req, res) => {
+    const { id } = req.params;
+    const { teamId } = req.body;
+    return res.status(200).json({ success: true, message: `Request ${id} assigned to team ${teamId}` });
+  });
+
+  app.post('/api/requests/:id/cancel', (req, res) => {
+    const { id } = req.params;
+    return res.status(200).json({ success: true, message: `Request ${id} cancelled` });
+  });
+
   app.get('/api/dispatch/map-data', (req, res) => {
     return res.status(200).json({
       requests: [

@@ -149,6 +149,7 @@ export default function RequestList() {
 
       {/* Detail Modal */}
       <RequestDetailModal 
+        isOpen={!!selectedRequest}
         request={selectedRequest} 
         onClose={() => setSelectedRequest(null)} 
       />

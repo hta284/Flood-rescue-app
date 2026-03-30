@@ -6,6 +6,7 @@ import { vi } from 'date-fns/locale';
 import { RescueRequestHistory, URGENCY_LEVELS } from '../types/rescue.types';
 
 interface RequestDetailModalProps {
+  isOpen: boolean;
   request: RescueRequestHistory | null;
   onClose: () => void;
 }
@@ -26,35 +27,34 @@ const STATUS_LABELS = {
   CANCELLED: 'Yêu cầu đã bị hủy',
 };
 
-export default function RequestDetailModal({ request, onClose }: RequestDetailModalProps) {
-  if (!request) return null;
-
-  const urgency = URGENCY_LEVELS.find(l => l.value === request.urgencyLevel);
-
+export default function RequestDetailModal({ isOpen, request, onClose }: RequestDetailModalProps) {
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-        >
-          {/* Header */}
-          <div className="bg-[#FF6B35] p-4 text-white flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${urgency?.color}`}>
-                {urgency?.icon}
+      {isOpen && request && (() => {
+        const urgency = URGENCY_LEVELS.find(l => l.value === request.urgencyLevel);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="bg-[#FF6B35] p-4 text-white flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${urgency?.color}`}>
+                    {urgency?.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold leading-tight">Chi tiết yêu cầu</h2>
+                    <p className="text-[10px] font-mono opacity-80 uppercase tracking-widest">{request.id}</p>
+                  </div>
+                </div>
+                <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <div>
-                <h2 className="text-lg font-bold leading-tight">Chi tiết yêu cầu</h2>
-                <p className="text-[10px] font-mono opacity-80 uppercase tracking-widest">{request.id}</p>
-              </div>
-            </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -179,6 +179,7 @@ export default function RequestDetailModal({ request, onClose }: RequestDetailMo
           </div>
         </motion.div>
       </div>
+      )})()}
     </AnimatePresence>
   );
 }

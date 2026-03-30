@@ -51,6 +51,25 @@ export interface RescueRequestHistory {
     time: string;
     note?: string;
   }[];
+  citizenPhone?: string;
+  citizenName?: string;
+}
+
+export interface CoordinatorStats {
+  pending: number;
+  verified: number;
+  assigned: number;
+  inProgress: number;
+  completedToday: number;
+}
+
+export interface AvailableTeam {
+  id: string;
+  teamName: string;
+  distance: number;
+  currentWorkload: number;
+  memberCount: number;
+  phone: string;
 }
 
 export interface MapData {
