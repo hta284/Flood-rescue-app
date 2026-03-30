@@ -1,0 +1,5 @@
+{
+  "name": "Flood Rescue App",
+  "description": "Flood rescue application with login page.",
+  "requestFramePermissions": ["geolocation"]
+}
